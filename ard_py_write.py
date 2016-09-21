@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 import serial
+import struct
 
-ser = serial.Serial('/dev/ttyACM0', 57600)
+ser = serial.Serial('/dev/ttyACM1', 57600)
 ser.close()
 ser.open()
 while True:
@@ -9,10 +10,12 @@ while True:
         val = raw_input('go or stop')
         if val == 'go':
             ser.write('y')
-            ser.write('0.1')
+            ba = bytearray(struct.pack('f', 0.2348))
+            ser.write(str(ba))
         else:
             ser.write('y')
-            ser.write('0.0')
+            ba = bytearray(struct.pack('f', 0.0))
+            ser.write(str(ba))
     except KeyboardInterrupt:
         ser.close()
         print 'serial connection closed'
