@@ -1,9 +1,9 @@
-import serial
 
 #!/usr/bin/env python
 """
 No more ROS as core communication.
 """
+import serial
 
 class HamrTranscriber():
     def __init__(self, port=None, msg_type=None, baud_rate=57600):
