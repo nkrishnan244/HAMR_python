@@ -73,10 +73,12 @@ class HamrWriter():
         return bytearray(struct.pack('f', value))
 
     def send_command(self, cmd_type, value):
+        print self.val_map[cmd_type]
         self.ser.close()
         self.ser.open()
-        self.ser.write(cmd_type)
-        self.ser.write(convert_float_to_byte_array(value))
+        self.ser.write(self.val_map[cmd_type])
+        val = str(self.convert_float_to_byte_array(value))
+        self.ser.write(val)
         self.ser.close()
 
     def sup(self):

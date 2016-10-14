@@ -5,14 +5,15 @@ A CLI controller for the HAMR.
 
 import hamr_writer
 
-hr = hamr_writer.HamrWriter(port=1)
+hr = hamr_writer.HamrWriter(port='/dev/ttyACM0')
 
 try:
     while True:
         print 'Would you like to send the HAMR in the x, y, or r direction?'
         direction = raw_input('')
         if direction not in ['x', 'y', 'r']:
-            print "That's not a valid direction."
+            hr.kill_motors()
+            print "That's not a valid direction. Killing all motors"
         else:
             print 'Sending hamr to ' + direction
             print 'What value?'
@@ -34,4 +35,5 @@ try:
             except ValueError:
                 print 'That is not a number'
 except KeyboardInterrupt:
+    hr.kill_motors()
     print 'end'

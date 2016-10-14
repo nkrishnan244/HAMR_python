@@ -2,7 +2,8 @@
 import serial
 import struct
 
-ser = serial.Serial('/dev/ttyACM1', 57600)
+
+ser = serial.Serial('/dev/ttyACM0', 57600)
 ser.close()
 ser.open()
 while True:
@@ -10,7 +11,7 @@ while True:
         val = raw_input('go or stop')
         if val == 'go':
             ser.write('y')
-            ba = bytearray(struct.pack('f', 0.2348))
+            ba = bytearray(struct.pack('f', 0.1232))
             ser.write(str(ba))
         else:
             ser.write('y')

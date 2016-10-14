@@ -4,6 +4,7 @@
 No more ROS as core communication.
 """
 import serial
+import time
 
 class HamrTranscriber():
     def __init__(self, port=None, msg_type=None, baud_rate=57600):
@@ -85,6 +86,7 @@ class HamrTranscriber():
 
 if __name__ == '__main__':
     ht = HamrTranscriber('/dev/ttyACM0', 'hamr_state')
-    for i in range(0,100):
+    while True:
         print ht.read()
+        time.sleep(0.5)
     ht.stop_read()
