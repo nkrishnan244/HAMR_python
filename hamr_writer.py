@@ -81,5 +81,3 @@ class HamrWriter():
         self.ser.write(val)
         self.ser.close()
 
-    def sup(self):
-        print 'sup'

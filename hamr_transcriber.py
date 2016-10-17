@@ -59,7 +59,7 @@ class HamrTranscriber():
         if msg_format == 'default':
             return self._default_formatting(raw_message)
         elif msg_format == 'ros':
-            print 'do the ros'
+            print 'ROS not implemented yet.'
 
     def _default_formatting(self, raw_dict):
         """

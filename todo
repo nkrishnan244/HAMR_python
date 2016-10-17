@@ -1,0 +1,2 @@
+do the "send serial on request" thing (since we can't concurrently do that) 
+do joystick
