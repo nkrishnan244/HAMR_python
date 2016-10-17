@@ -125,12 +125,7 @@ class HamrInterpreter():
         message = {}
         if not self.ser.isOpen():
             self.ser.open()
-        print 'sending request...'
-        self._send_command('MSG_REQUEST', 0.0)
-        print 'request sent.'
-        print 'waiting for line...'
         raw_data = self.ser.readline()
-        print 'line read'
         raw_data_list = raw_data.split(' ')
         for i in raw_data_list:
             line_tuple = self._parse_result(i)

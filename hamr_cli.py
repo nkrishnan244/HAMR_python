@@ -4,13 +4,12 @@ A CLI controller for the HAMR.
 """
 
 import hamr_interpreter as hi
+import time
 
 interpreter = hi.HamrInterpreter(port='/dev/ttyACM0', msg_type='hamr_state')
 
-print 'starting...'
 
-#while True:
-#    interpreter.read()
+
 try:
     while True:
         print 'Would you like to send the HAMR in the x, y, or r direction? Or would you like the current state of the HAMR (msg)?'
