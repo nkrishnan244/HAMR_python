@@ -163,3 +163,4 @@ class HamrInterpreter():
         self.ser.write(self.val_map[cmd_type])
         val = str(self._convert_float_to_byte_array(value))
         self.ser.write(val)
+        print 'sent'

@@ -46,7 +46,10 @@ class HamrWriter():
             # holonomic R PID
             'SIG_HOLO_R_KP': 'U',
             'SIG_HOLO_R_KI': 'I',
-            'SIG_HOLO_R_KD': 'O'
+            'SIG_HOLO_R_KD': 'O',
+            # start messages
+            'START_MESSAGE': '#',
+            'CHECKSUM': '/'
         }
 
 	if port == None:
@@ -55,29 +58,40 @@ class HamrWriter():
 
     # Holonomic control commands
     def send_x(self, value=0.0):
-        self.send_command('SIG_HOLO_X', value)
+        for i in range(0,4):
+            self.send_command('SIG_HOLO_X', value)
 
     def send_y(self, value=0.0):
-        self.send_command('SIG_HOLO_Y', value)
+        for i in range(0,4):
+            self.send_command('SIG_HOLO_Y', value)
 
     def send_r(self, value=0.0):
-        self.send_command('SIG_HOLO_R', value)
+        for i in range(0,4):
+            self.send_command('SIG_HOLO_R', value)
 
     def kill_motors(self):
-        self.send_x()
-        self.send_y()
-        self.send_r()
+        for i in range(0,4):
+            self.send_x()
+            self.send_y()
+            self.send_r()
+
+    def end_communication(self):
+        self.kill_motors()
+        self.ser.close()
 
     # Helper Methods
     def convert_float_to_byte_array(self, value):
         return bytearray(struct.pack('f', value))
 
     def send_command(self, cmd_type, value):
-        print self.val_map[cmd_type]
-        self.ser.close()
-        self.ser.open()
-        self.ser.write(self.val_map[cmd_type])
+        # start char, message_type, value
+        if not (self.ser.isOpen()):
+            self.ser.open()
+        self.ser.write(self.val_map['START_MESSAGE'])
+        print self.val_map['START_MESSAGE']
+        #self.ser.write(self.val_map[cmd_type])
         val = str(self.convert_float_to_byte_array(value))
         self.ser.write(val)
+        self.ser.write(self.val_map['CHECKSUM'])
         self.ser.close()
 
