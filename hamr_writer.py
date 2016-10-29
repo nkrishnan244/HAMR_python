@@ -87,11 +87,14 @@ class HamrWriter():
         # start char, message_type, value
         if not (self.ser.isOpen()):
             self.ser.open()
+        # send startchar
         self.ser.write(self.val_map['START_MESSAGE'])
-        print self.val_map['START_MESSAGE']
-        #self.ser.write(self.val_map[cmd_type])
+        # length
+        self.ser.write(bytes(chr(10)))
+        # type
+        self.ser.write(self.val_map[cmd_type])
+        # float byte array
         val = str(self.convert_float_to_byte_array(value))
         self.ser.write(val)
+        # checksum
         self.ser.write(self.val_map['CHECKSUM'])
-        self.ser.close()
-
