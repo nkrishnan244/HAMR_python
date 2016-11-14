@@ -2,13 +2,13 @@ import socket
 import struct
 
 MESSAGE = 'sup'
-address = ('192.168.10.12', 2390)
+address = ('192.168.10.13', 2390)
 
 sock = socket.socket(socket.AF_INET, # Internet
                              socket.SOCK_DGRAM) # UDP
 
 # arbitrarily set message_type as 100
-message_type = 100
+message_type = 103
 
 def message_generator(message_type, data=[]):
     # test message takes three ints
