@@ -1,3 +1,10 @@
+"""
+This is the working python interface for wifi communication for the HAMR (as of 11/14/2016)
+If not working- be sure to check the ip address of the HAMR and make sure it matches with
+the first value in the address tuple.
+Also be sure that the second int for the tuple (the local port) matches up.
+Also be sure that the message type is the same.
+"""
 import socket
 import struct
 
@@ -7,7 +14,7 @@ address = ('192.168.10.13', 2390)
 sock = socket.socket(socket.AF_INET, # Internet
                              socket.SOCK_DGRAM) # UDP
 
-# arbitrarily set message_type as 100
+# arbitrarily set message_type as 103
 message_type = 103
 
 def message_generator(message_type, data=[]):
