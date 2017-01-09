@@ -9,7 +9,7 @@ import socket
 import struct
 
 MESSAGE = 'sup'
-address = ('192.168.10.13', 2390)
+address = ('10.0.50.185', 2390)
 
 sock = socket.socket(socket.AF_INET, # Internet
                              socket.SOCK_DGRAM) # UDP
