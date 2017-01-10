@@ -8,8 +8,9 @@ Also be sure that the message type is the same.
 import socket
 import struct
 
-MESSAGE = 'sup'
-address = ('10.0.50.185', 2390)
+SERVER_IP = '192.168.1.1'
+SERVER_PORT = 2390
+address = (SERVER_IP, SERVER_PORT)
 
 sock = socket.socket(socket.AF_INET, # Internet
                              socket.SOCK_DGRAM) # UDP
@@ -18,13 +19,14 @@ sock = socket.socket(socket.AF_INET, # Internet
 message_type = 103
 
 def message_generator(message_type, data=[]):
-    # test message takes three ints
+    # test message takes three ints and turns them into floats.
     msg = chr(message_type)
     msg += struct.pack("<" + 'fff', *data)
     return msg
 
 def send_message(message):
-    sock.sendto(message, address)
+    for _ in range(0, 2):
+        sock.sendto(message, address)
 
 while True:
     print 'What values?'
