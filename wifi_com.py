@@ -16,12 +16,19 @@ sock = socket.socket(socket.AF_INET, # Internet
                              socket.SOCK_DGRAM) # UDP
 
 # arbitrarily set message_type as 103
-message_type = 103
+messages = {
+        'holo_drive': (103, 'fff'),
+        'dif_drive': (104, 'fff')
+}
+
 
 def message_generator(message_type, data=[]):
-    # test message takes three ints and turns them into floats.
-    msg = chr(message_type)
-    msg += struct.pack("<" + 'fff', *data)
+    msg_type = messages[message_type][0]
+    msg_format = messages[message_type][1]
+    msg = chr(msg_type)
+    if (len(data) != len(msg_format)):
+        raise ValueError('You have provided insufficient data for a message')
+    msg += struct.pack("<" + msg_format, *data)
     return msg
 
 def send_message(message):
@@ -29,6 +36,7 @@ def send_message(message):
         sock.sendto(message, address)
 
 while True:
+    msg_typ = raw_input('What message do you want to send? Holonomic (h) or Dif Drive (d)?\n')
     print 'What values?'
     answer = raw_input("")
     data = answer.split(" ")
@@ -36,6 +44,9 @@ while True:
     for i in data:
         print float(i)
         converted_data.append(float(i))
-
-    message = message_generator(message_type, converted_data)
-    send_message(message)
+    if msg_typ == 'h':
+        print 'sending holo message'
+        send_message(message_generator('holo_drive', converted_data))
+    else:
+        print 'sending dif drive message'
+        send_message(message_generator('dif_drive', converted_data))
