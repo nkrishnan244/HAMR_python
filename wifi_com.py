@@ -37,16 +37,25 @@ def send_message(message):
 
 while True:
     msg_typ = raw_input('What message do you want to send? Holonomic (h) or Dif Drive (d)?\n')
-    print 'What values?'
-    answer = raw_input("")
-    data = answer.split(" ")
-    converted_data = []
-    for i in data:
-        print float(i)
-        converted_data.append(float(i))
-    if msg_typ == 'h':
-        print 'sending holo message'
-        send_message(message_generator('holo_drive', converted_data))
-    else:
-        print 'sending dif drive message'
+    if (msg_typ == 'kill'):
+        print 'KILLING'
+        converted_data = [0.0, 0.0, 0.0]
         send_message(message_generator('dif_drive', converted_data))
+    else:
+        print 'What values?'
+        answer = raw_input("")
+        data = answer.split(" ")
+        converted_data = []
+        for i in data:
+            print float(i)
+            converted_data.append(float(i))
+        if msg_typ == 'h':
+            print 'sending holo message'
+            send_message(message_generator('holo_drive', converted_data))
+        elif msg_typ == 'd':
+            print 'sending dif drive message'
+            send_message(message_generator('dif_drive', converted_data))
+        else:
+            print 'KILLING'
+            converted_data = [0.0, 0.0, 0.0]
+            send_message(message_generator('dif_drive', converted_data))
