@@ -5,7 +5,7 @@ import struct
 class HamrMessenger():
     """An interface that allows for motor commands to be sent to the HAMR.
 
-    If the source code on the HAMR was not changed, custom params for initialization should not be 
+    If the source code on the HAMR was not changed, custom params for initialization should not be
     necessary.
 
     Attributes:
@@ -13,13 +13,13 @@ class HamrMessenger():
         server_port: An integer that represents the port the HAMR is listening on.
         address: A tuple with server_ip and server_port
         sock: A socket object responsible for sending out messages
-        message_types: A dictionary with the name of message associated with a tuple that contains the 
+        message_types: A dictionary with the name of message associated with a tuple that contains the
                        ID of the message and format of the message.
     """
 
     def __init__(self, server_ip='192.168.1.1', server_port=2390):
         """Inits the HamrMessenger"""
-        self.address=(server_ip, server_ip)
+        self.address=(server_ip, server_port)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.message_types = {
             'holo_drive': (103, 'fff'),
@@ -28,30 +28,30 @@ class HamrMessenger():
 
     def send_holonomic_command(self, x=0, y=0, r=0):
         """Sends a command to the HAMR to move in a holonomic fashion.
-        
+
         Args:
             x: Float that represents the desired velocity in the x direction (m/s).
             y: Float that represents the desired velocity in the y direction (m/s).
             r: Float that represents the desired velocity of the turret (deg/s).
         """
         vector = [float(x), float(y), float(r)]
-        _send_message(_message_generator('holo_drive'), vector)
+        self._send_message(self._message_generator('holo_drive', vector))
 
     def send_dif_drive_command(self, left=0, right=0, r=0):
         """Sends a command to the HAMR to move in its dif drive mode.
-        
+
         Args:
             left: Float that represents the desired velocity of the left motor (m/s).
             right: Float that represents the desired velocity of the right motor (m/s).
             r: Float that represents the desired velocity of the turret motor (deg/s).
         """
         vector = [float(left), float(right), float(r)]
-        _send_message(_message_generator('dif_drive'), vector)    
-        
+        self._send_message(self._message_generator('dif_drive', vector))
+
     def kill_motors(self):
         """Method that sets all desired velocities to 0."""
         for i in range(0,5):
-            send_dif_drive_command()
+            self.send_dif_drive_command()
 
     def _message_generator(self, message_type, data=[]):
         """Returns a message of the specified type containing the data given."""
@@ -64,4 +64,4 @@ class HamrMessenger():
         return msg
 
     def _send_message(self, message):
-        sock.sendto(message, address)
+        self.sock.sendto(message, self.address)

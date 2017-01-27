@@ -1,6 +1,7 @@
 import pygame
 import pygame.joystick as joystick
 import pygame.event as event
+import hamr_messenger as hm
 
 class JoystickController:
     """Object that handles joystick events.
@@ -48,6 +49,10 @@ class JoystickController:
             'KILL_MOTORS': 9
         }
         self.holonomic_mode = True
+        self.delta_turret = 5.0
+        self.turret_scalar = 5.0
+        self.messenger = hm.HamrMessenger()
+        self.velocity_vector = [0.0, 0.0, 0.0]
         pygame.init()
         if (joystick.get_count) == 0:
             raise AttributeError('No joystick recognized')
@@ -64,9 +69,13 @@ class JoystickController:
                 self.handle_dif_drive_joystick_event(direction, magnitude)
         elif (event.type == self.event_types['BUTTON_DOWN']):
             if (event.button == self.button_ids['KILL_MOTORS']):
-                print 'motors should be killed'
+                print 'Killing Motors.'
+                self.velocity_vector = [0.0, 0.0, 0.0]
+                self.messenger.kill_motors()
             elif (event.button == self.button_ids['TOGGLE_MODE']):
                 self.holonomic_mode = not self.holonomic_mode
+                self.velocity_vector = [0.0, 0.0, 0.0]
+                self.messenger.kill_motors()
                 if (self.holonomic_mode):
                     print 'Toggling Holonomic Mode.'
                 else:
@@ -75,32 +84,47 @@ class JoystickController:
                 self.handle_dif_drive_button_event(event)
         elif (event.type == self.event_types['BUTTON_UP']):
             if (event.button == self.button_ids['LEFT_TRIGGER']) or (event.button == self.button_ids['RIGHT_TRIGGER']):
-                print 'stopping the turret'
-
+                self.velocity_vector[2] = 0.0
+                self._send_dif_drive_message()
 
     def handle_holonomic_joystick_event(self, axis, value):
         if (axis == self.joystick_axes['X_LEFT']):
-            print 'send turret cmd'
+            self.velocity_vector[2] = value
         elif (axis == self.joystick_axes['X_RIGHT']):
-            print 'send hamr to x'
+            self.velocity_vector[0] = value
         elif (axis == self.joystick_axes['Y_RIGHT']):
-            print 'send hamr to y'
+            self.velocity_vector[1] = value
+        self._send_holo_message()
 
     def handle_dif_drive_joystick_event(self, axis, value):
         if (axis == self.joystick_axes['Y_LEFT']):
-            print 'move left wheel'
+            self.velocity_vector[0] = value
         elif (axis == self.joystick_axes['Y_RIGHT']):
-            print 'move right wheel'
+            self.velocity_vector[1] = value
+        self._send_dif_drive_message
 
     def handle_dif_drive_button_event(self, event):
         if (event.button == self.button_ids['INCREASE_SCALAR']):
-            print 'increase the rate at which the motor moves'
+            self.turret_scalar += self.delta_turret
+            print 'The turret will now move at ' + str(self.turret_scalar) + ' deg/s.'
         elif (event.button == self.button_ids['DECREASE_SCALAR']):
-            print 'decrease the rate at which the motor moves'
+            if (self.turret_scalar > 0):
+                self.turret_scalar -= self.delta_turret
+                print 'The turret will now move at ' + str(self.turret_scalar) + ' deg/s.'
         elif (event.button == self.button_ids['LEFT_TRIGGER']):
-            print 'move the turret left'
+            self.velocity_vector[2] = -1 * self.turret_scalar
+            self._send_dif_drive_message()
         elif (event.button == self.button_ids['RIGHT_TRIGGER']):
-            print 'move the turret right'
+            self.velocity_vector[2] = 1 * self.turret_scalar
+            self._send_dif_drive_message()
+
+    def _send_dif_drive_message(self):
+        self.messenger.send_dif_drive_command(self.velocity_vector[0], self.velocity_vector[1], self.velocity_vector[2])
+
+    def _send_holo_message(self):
+        self.messenger.send_holonomic_command(self.velocity_vector[0], self.velocity_vector[1], self.velocity_vector[2])
+
+
 
 if __name__ == '__main__':
     jc = JoystickController()
@@ -108,19 +132,3 @@ if __name__ == '__main__':
         event_list = event.get()
         for event_obj in event_list:
             jc.handle_event(event_obj)
-
-    # for event_obj in event_list:
-    #     if event_obj.type == 7:
-    #         joystick_direction = event_obj.axis
-    #         movement_magnitude = round(event_obj.value, 2)
-    #         if movement_magnitude != 0.0:
-    #             if joystick_direction == X_LEFT_JOYSTICK:
-    #                 print 'Right Joystick in the x direction scalar: ' + str(movement_magnitude)
-    #             elif joystick_direction == Y_LEFT_JOYSTICK:
-    #                 print 'right joystick in the y direction scalar: ' + str(movement_magnitude)
-    #             elif joystick_direction == X_RIGHT_JOYSTICK:
-    #                 print 'moving the hamr in the x direction, scalar: ' + str(movement_magnitude)
-    #             elif joystick_direction == Y_RIGHT_JOYSTICK:
-    #                 print 'moving the hamr in the y direction, scalar: ' + str(movement_magnitude)
-    #     else:
-    #         print 'Button pressed: killing motors'
