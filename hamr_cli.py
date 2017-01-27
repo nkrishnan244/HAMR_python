@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 import hamr_messenger as hm
 
-class HamrCLI():
-    """A CLI App for the HAMR. 
+class HamrCLI(object):
+    """A CLI App for the HAMR.
 
     Attributes:
         messenger: An instance of the HamrMessenger object.
@@ -50,7 +50,7 @@ class HamrCLI():
         r = raw_input('What r?\n')
         dvect = (float(x), float(y), float(r))
         print('Sending vector ' + str(dvect) + '\n')
-        # self.messenger.send_holonomic_command(dvect[0], dvect[1], dvect[2])
+        self.messenger.send_holonomic_command(dvect[0], dvect[1], dvect[2])
 
     def dif_drive(self):
         left = raw_input('Desired Left Motor velocity?\n')
@@ -58,7 +58,7 @@ class HamrCLI():
         turret = raw_input('Desired Turret Motor velocity?\n')
         dvect = (float(left), float(right), float(turret))
         print('Sending vector ' + str(dvect) + '\n')
-        # self.messenger.send_dif_drive_command(dvect[0], dvect[1], dvect[2])
+        self.messenger.send_dif_drive_command(dvect[0], dvect[1], dvect[2])
 
 if __name__ == '__main__':
     cli = HamrCLI()

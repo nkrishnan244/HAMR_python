@@ -2,7 +2,7 @@
 import socket
 import struct
 
-class HamrMessenger():
+class HamrMessenger(object):
     """An interface that allows for motor commands to be sent to the HAMR.
 
     If the source code on the HAMR was not changed, custom params for initialization should not be
@@ -35,7 +35,8 @@ class HamrMessenger():
             r: Float that represents the desired velocity of the turret (deg/s).
         """
         vector = [float(x), float(y), float(r)]
-        self._send_message(self._message_generator('holo_drive', vector))
+        msg = self._message_generator('holo_drive', vector)
+        self._send_message(msg)
 
     def send_dif_drive_command(self, left=0, right=0, r=0):
         """Sends a command to the HAMR to move in its dif drive mode.
@@ -64,4 +65,5 @@ class HamrMessenger():
         return msg
 
     def _send_message(self, message):
-        self.sock.sendto(message, self.address)
+        for _ in range(0, 2):
+            self.sock.sendto(message, self.address)

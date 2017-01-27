@@ -101,7 +101,7 @@ class JoystickController:
             self.velocity_vector[0] = value
         elif (axis == self.joystick_axes['Y_RIGHT']):
             self.velocity_vector[1] = value
-        self._send_dif_drive_message
+        self._send_dif_drive_message()
 
     def handle_dif_drive_button_event(self, event):
         if (event.button == self.button_ids['INCREASE_SCALAR']):
