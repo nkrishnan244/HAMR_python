@@ -2,26 +2,31 @@ import pygame
 import pygame.joystick as joystick
 import pygame.event as event
 
-# Joystick Constants
-
-"""
-ok so thoughts:
-    we'll store a state in the class that'll store whether you're in holo or difdrive mode.
-
-    holo mode:
-        left joystick: turret
-        right joystick: x/y control
-    difdrive:
-        left joystick: left wheel
-        right joystick: right wheel
-        triggers: turret.
-        Button 1/4 => increase the scalar at which the turret moves.
-    Switch between modes:
-        press button 9
-    Kill it:
-        press button 10
-"""
 class JoystickController:
+    """Object that handles joystick events.
+
+    It is important to note that this joystick uses a very particular kind of joystick.
+    Usage Instructions:
+        The Joystick Controller starts in holonomic mode. 
+        You can toggle between modes by pressing button 9.
+        In holonomic mode:
+            Use left joystick to orient the turret
+            Use right joystick to move the turret.
+        In Dif Drive mode:
+            Use left joystick to move left motor.
+            Use right joystick to move right motor.
+            Use the left/right trigger buttons to move the turret.
+            Use buttons 1 and 4 to decrease/increase the speed at which the turret moves, respectively.
+
+        It's important to note that you have total control of the speed of the motors in holonomic mode, but 
+        have to manually adjust the speed at which the turret moves in dif drive mode.
+
+    Attributes:
+        event_types: A dictionary that enumerates events that are handled.
+        joystick_axes: A dictionary that translates axes of the joystick to their number representations.
+        button_ids: A dictionary that translates button functionality to their number representations.
+        holonomic_mode: A boolean that determines whether holonomic drive is being used. If false, dif drive is being used.
+    """
     def __init__(self):
         self.event_types = {
             'BUTTON_DOWN': 10,
@@ -51,11 +56,12 @@ class JoystickController:
 
     def handle_event(self, event):
         if (event.type == self.event_types['JOY_AXIS_MOTION']):
-            # if (self.holonomic_mode):
-            #     # handle the joystick event in a holonomic fashion
-            # else:
-            #     # handle joystick in difdrive mode
-            print 'joystick axis'
+            direction = event_obj.axis
+            magnitude = round(event_obj.value, 2)
+            if (self.holonomic_mode):
+                self.handle_holonomic_joystick_event(direction, magnitude)
+            else:
+                self.handle_dif_drive_joystick_event(direction, magnitude)
         elif (event.type == self.event_types['BUTTON_DOWN']):
             if (event.button == self.button_ids['KILL_MOTORS']):
                 print 'motors should be killed'
@@ -63,18 +69,38 @@ class JoystickController:
                 self.holonomic_mode = !self.holonomic_mode
                 print 'mode toggled'
             elif (!self.holonomic_mode):
-                if (event.button == self.button_ids['INCREASE_SCALAR']):
-                    print 'increase the rate at which the motor moves'
-                elif (event.button == self.button_ids['DECREASE_SCALAR']):
-                    print 'decrease the rate at which the motor moves'
+                self.handle_dif_drive_button_event(event)
 
-                # handle buttondown in holonomic fashion
+    def handle_holonomic_joystick_event(self, axis, value):
+        if (axis == self.joystick_axes['X_LEFT']):
+            print 'send turret cmd'
+        elif (axis == self.joystick_axes['X_RIGHT']):
+            print 'send hamr to x'
+        elif (axis == self.joystick_axes['Y_RIGHT']):
+            print 'send hamr to y'
 
-while True:
-    lm = JoystickController()
-    event_list = event.get()
-    for event_obj in event_list:
-        lm.handle_event(event_obj)
+    def handle_dif_drive_joystick_event(self, axis, value):
+        if (axis == self.joystick_axes['Y_LEFT']):
+            print 'move left wheel'
+        elif (axis == self.joystick_axes['Y_RIGHT']):
+            print 'move right wheel'
+
+    def handle_dif_drive_button_event(self, event):
+        if (event.button == self.button_ids['INCREASE_SCALAR']):
+            print 'increase the rate at which the motor moves'
+        elif (event.button == self.button_ids['DECREASE_SCALAR']):
+            print 'decrease the rate at which the motor moves'
+        elif (event.button == self.button_ids['LEFT_TRIGGER']):
+            print 'move the turret left'
+        elif (event.button == self.button_ids['RIGHT_TRIGGER']):
+            print 'move the turret right'
+
+if __name__ == '__main__':
+    jc = JoystickController()
+    while True:
+        event_list = event.get()
+        for event_obj in event_list:
+            jc.handle_event(event_obj)
         
     # for event_obj in event_list:
     #     if event_obj.type == 7:
