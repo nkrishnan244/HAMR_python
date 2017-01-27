@@ -1,14 +1,13 @@
 #! /usr/bin/env python
-"""
-A CLI controller for the HAMR.
-"""
-
 import hamr_messenger as hm
 
-messenger = hm.HamrMessenger()
-do_next_iter = True
-
 class HamrCLI():
+    """A CLI App for the HAMR. 
+
+    Attributes:
+        messenger: An instance of the HamrMessenger object.
+        do_next_iter: A boolean that determines whether the app continues.
+    """
     def __init__(self):
         self.messenger = hm.HamrMessenger()
         self.do_next_iter = True
