@@ -3,45 +3,68 @@
 A CLI controller for the HAMR.
 """
 
-import hamr_writer as hw
-import time
+import hamr_messenger as hm
 
-writer = hw.HamrWriter(port='/dev/ttyACM0')
+messenger = hm.HamrMessenger()
+do_next_iter = True
 
-try:
-    while True:
-        print 'Would you like to send the HAMR in the x, y, or r direction? Or would you like the current state of the HAMR (msg)?'
-        direction = raw_input('')
-        if direction not in ['x', 'y', 'r', 'msg']:
-            writer.kill_motors()
-            # interpreter.kill_motors()
-            print "That's not a valid command. Killing all motors"
+class HamrCLI():
+    def __init__(self):
+        self.messenger = hm.HamrMessenger()
+        self.do_next_iter = True
+
+    def opening(self):
+        print '/****************************/'
+        print '/* Welcome to the HAMR CLI! */'
+        print '/****************************/'
+        print 'Be sure to verify that the HAMR is on and you are connected to its Access Point.'
+
+    def show_options(self):
+        print 'Would you like to: '
+        print '1) Send a holonomic message'
+        print '2) Send a dif drive message'
+        print '3) Stop all motors?'
+        print '4) Exit?'
+        print 'Input the corresponding number to make a choice'
+        return raw_input('')
+
+    def handle_decision(self, decision):
+        if decision == '1':
+            print 'You selected Holonomic Drive.'
+            self.holo_drive()
+        elif decision == '2':
+            print 'You selected Dif Drive.'
+            self.dif_drive()
+        elif decision == '3':
+            print 'Killing Motors.\n'
+            # self.messenger.kill_motors()
+        elif decision == '4':
+            # self.messenger.kill_motors()
+            self.do_next_iter = False
+            print 'Stopping the HAMR and the interface.\n'
         else:
-            if direction == 'msg':
-                print 'Reading...'
-                print interpreter.read()
-                print 'Done'
-            else:
-                print 'Sending hamr to ' + direction
-                print 'What value?'
-                try:
-                    val = float(raw_input(''))
-                    if val > 1.0:
-                        print "That's a large value. are you sure you want to send that? y/n"
-                        ans = raw_input('')
-                        if ans != 'y':
-                            print 'assigning value as 0.0'
-                            val = 0
-                    if direction == 'x':
-                        writer.send_x(val)
-                    elif direction == 'y':
-                        writer.send_y(val)
-                    elif direction == 'r':
-                        writer.send_r(val)
-                    print 'Sent ' + str(val) + ' to ' + direction
-                except ValueError:
-                    print 'That is not a number'
+            print 'Not a valid message!\n'
 
-except KeyboardInterrupt:
-    interpreter.kill_motors()
-    print 'end'
+    def holo_drive(self):
+        x = raw_input('What x?\n')
+        y = raw_input('What y?\n')
+        r = raw_input('What r?\n')
+        dvect = (float(x), float(y), float(r))
+        print('Sending vector ' + str(dvect) + '\n')
+        # self.messenger.send_holonomic_command(dvect[0], dvect[1], dvect[2])
+
+    def dif_drive(self):
+        left = raw_input('Desired Left Motor velocity?\n')
+        right = raw_input('Desired Right Motor velocity?\n')
+        turret = raw_input('Desired Turret Motor velocity?\n')
+        dvect = (float(left), float(right), float(turret))
+        print('Sending vector ' + str(dvect) + '\n')
+        # self.messenger.send_dif_drive_command(dvect[0], dvect[1], dvect[2])
+
+if __name__ == '__main__':
+    cli = HamrCLI()
+    cli.opening()
+    while cli.do_next_iter:
+        option = cli.show_options()
+        cli.handle_decision(str(option))
+

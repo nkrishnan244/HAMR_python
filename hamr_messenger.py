@@ -19,7 +19,7 @@ class HamrMessenger():
 
     def __init__(self, server_ip='192.168.1.1', server_port=2390):
         """Inits the HamrMessenger"""
-        self.address=(SERVER_IP, SERVER_PORT)
+        self.address=(server_ip, server_ip)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.message_types = {
             'holo_drive': (103, 'fff'),
@@ -35,7 +35,7 @@ class HamrMessenger():
             r: Float that represents the desired velocity of the turret (deg/s).
         """
         vector = [float(x), float(y), float(r)]
-        send_message(_message_generator('holo_drive'), vector)
+        _send_message(_message_generator('holo_drive'), vector)
 
     def send_dif_drive_command(self, left=0, right=0, r=0):
         """Sends a command to the HAMR to move in its dif drive mode.
@@ -46,7 +46,7 @@ class HamrMessenger():
             r: Float that represents the desired velocity of the turret motor (deg/s).
         """
         vector = [float(left), float(right), float(r)]
-        send_message(_message_generator('dif_drive'), vector)    
+        _send_message(_message_generator('dif_drive'), vector)    
         
     def kill_motors(self):
         """Method that sets all desired velocities to 0."""
@@ -63,9 +63,5 @@ class HamrMessenger():
         msg += struct.pack('<' + msg_format, *data)
         return msg
 
-    def send_message(self, message):
-        """Method that sends a provided message to the address defined.
-        Args:
-            message: A packet of binary data that represents the desired message.
-        """
+    def _send_message(self, message):
         sock.sendto(message, address)

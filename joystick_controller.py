@@ -10,7 +10,6 @@ X_RIGHT_JOYSTICK = 2
 Y_RIGHT_JOYSTICK = 3
 writer = hw.HamrWriter(port='/dev/ttyACM0')
 
-
 pygame.init()
 if joystick.get_count == 0:
     raise AttributeError("No joystick recognized")
