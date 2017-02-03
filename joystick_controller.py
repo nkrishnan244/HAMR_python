@@ -27,6 +27,10 @@ class JoystickController:
         joystick_axes: A dictionary that translates axes of the joystick to their number representations.
         button_ids: A dictionary that translates button functionality to their number representations.
         holonomic_mode: A boolean that determines whether holonomic drive is being used. If false, dif drive is being used.
+        delta_turret: A float that dictates rate at which turret_scalar should be change per button press.
+        turret_scalar: A float that dictates the rate at which the turret should move.
+        velocity_scalar: A float that is multiplied to the raw readings to lower the values to something more reasonable.
+        velocity_vector: An array of floats that stores the values to be sent- either X, Y, R for holonomic or right, left, turret for DD.
     """
     def __init__(self):
         self.event_types = {
@@ -51,6 +55,7 @@ class JoystickController:
         self.holonomic_mode = True
         self.delta_turret = 5.0
         self.turret_scalar = 5.0
+        self.velocity_scalar = 0.5
         self.messenger = hm.HamrMessenger()
         self.velocity_vector = [0.0, 0.0, 0.0]
         pygame.init()
@@ -98,9 +103,9 @@ class JoystickController:
 
     def handle_dif_drive_joystick_event(self, axis, value):
         if (axis == self.joystick_axes['Y_LEFT']):
-            self.velocity_vector[0] = value
-        elif (axis == self.joystick_axes['Y_RIGHT']):
             self.velocity_vector[1] = value
+        elif (axis == self.joystick_axes['Y_RIGHT']):
+            self.velocity_vector[0] = value
         self._send_dif_drive_message()
 
     def handle_dif_drive_button_event(self, event):
@@ -112,19 +117,19 @@ class JoystickController:
                 self.turret_scalar -= self.delta_turret
                 print 'The turret will now move at ' + str(self.turret_scalar) + ' deg/s.'
         elif (event.button == self.button_ids['LEFT_TRIGGER']):
-            self.velocity_vector[2] = -1 * self.turret_scalar
+            self.velocity_vector[2] = 1 * self.turret_scalar
             self._send_dif_drive_message()
         elif (event.button == self.button_ids['RIGHT_TRIGGER']):
-            self.velocity_vector[2] = 1 * self.turret_scalar
+            self.velocity_vector[2] = -1 * self.turret_scalar
             self._send_dif_drive_message()
 
     def _send_dif_drive_message(self):
+        self.velocity_vector[0] = self.velocity_vector[0] * self.velocity_scalar
+        self.velocity_vector[1] = self.velocity_vector[1] * self.velocity_scalar
         self.messenger.send_dif_drive_command(self.velocity_vector[0], self.velocity_vector[1], self.velocity_vector[2])
 
     def _send_holo_message(self):
         self.messenger.send_holonomic_command(self.velocity_vector[0], self.velocity_vector[1], self.velocity_vector[2])
-
-
 
 if __name__ == '__main__':
     jc = JoystickController()
@@ -132,3 +137,4 @@ if __name__ == '__main__':
         event_list = event.get()
         for event_obj in event_list:
             jc.handle_event(event_obj)
+

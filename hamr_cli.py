@@ -36,9 +36,9 @@ class HamrCLI(object):
             self.dif_drive()
         elif decision == '3':
             print 'Killing Motors.\n'
-            # self.messenger.kill_motors()
+            self.messenger.kill_motors()
         elif decision == '4':
-            # self.messenger.kill_motors()
+            self.messenger.kill_motors()
             self.do_next_iter = False
             print 'Stopping the HAMR and the interface.\n'
         else:

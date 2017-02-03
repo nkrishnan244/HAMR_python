@@ -46,13 +46,12 @@ class HamrMessenger(object):
             right: Float that represents the desired velocity of the right motor (m/s).
             r: Float that represents the desired velocity of the turret motor (deg/s).
         """
-        vector = [float(right), float(left), float(r)]
+        vector = [float(right) * -1.0, float(left), float(r)]
         self._send_message(self._message_generator('dif_drive', vector))
 
     def kill_motors(self):
         """Method that sets all desired velocities to 0."""
-        for i in range(0,5):
-            self.send_dif_drive_command()
+        self.send_dif_drive_command(0.0, 0.0, 0.0)
 
     def _message_generator(self, message_type, data=[]):
         """Returns a message of the specified type containing the data given."""
