@@ -53,8 +53,8 @@ class HamrCLI(object):
         self.messenger.send_holonomic_command(dvect[0], dvect[1], dvect[2])
 
     def dif_drive(self):
-        left = raw_input('Desired Left Motor velocity?\n')
-        right = raw_input('Desired Right Motor velocity?\n')
+        left = raw_input('Desired Right Motor velocity?\n')
+        right = raw_input('Desired Left Motor velocity?\n')
         turret = raw_input('Desired Turret Motor velocity?\n')
         dvect = (float(left), float(right), float(turret))
         print('Sending vector ' + str(dvect) + '\n')

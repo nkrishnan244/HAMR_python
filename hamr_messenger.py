@@ -38,7 +38,7 @@ class HamrMessenger(object):
         msg = self._message_generator('holo_drive', vector)
         self._send_message(msg)
 
-    def send_dif_drive_command(self, left=0, right=0, r=0):
+    def send_dif_drive_command(self, right=0, left=0, r=0):
         """Sends a command to the HAMR to move in its dif drive mode.
 
         Args:
@@ -46,7 +46,7 @@ class HamrMessenger(object):
             right: Float that represents the desired velocity of the right motor (m/s).
             r: Float that represents the desired velocity of the turret motor (deg/s).
         """
-        vector = [float(left), float(right), float(r)]
+        vector = [float(right), float(left), float(r)]
         self._send_message(self._message_generator('dif_drive', vector))
 
     def kill_motors(self):
