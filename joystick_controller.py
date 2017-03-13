@@ -59,6 +59,8 @@ class JoystickController:
         self.velocity_scalar = 0.5
         self.messenger = hm.HamrMessenger()
         self.velocity_vector = [0.0, 0.0, 0.0]
+	self.last_time      = 0.0
+	self.loop_dur 	    = 0.1
         pygame.init()
         if (joystick.get_count) == 0:
             raise AttributeError('No joystick recognized')
@@ -139,6 +141,7 @@ if __name__ == '__main__':
     loop_dur  = 0.1
     while True:
 	if now()-last_time>loop_dur:
+		print (now()-last_time)		
 		last_time = now()
 		event_list = event.get()
 		for event_obj in event_list:
