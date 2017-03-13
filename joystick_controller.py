@@ -2,6 +2,7 @@ import pygame
 import pygame.joystick as joystick
 import pygame.event as event
 import hamr_messenger as hm
+from time import time as now
 
 class JoystickController:
     """Object that handles joystick events.
@@ -98,7 +99,8 @@ class JoystickController:
         elif (axis == self.joystick_axes['X_RIGHT']):
             self.velocity_vector[0] = value
         elif (axis == self.joystick_axes['Y_RIGHT']):
-            self.velocity_vector[1] = value
+            self.velocity_vector[1] = -1*value
+	print 'Sending: ' + str(self.velocity_vector[0]) +', '+str(self.velocity_vector[1]) +', '+str(self.velocity_vector[2])
         self._send_holo_message()
 
     def handle_dif_drive_joystick_event(self, axis, value):
@@ -133,8 +135,12 @@ class JoystickController:
 
 if __name__ == '__main__':
     jc = JoystickController()
+    last_time = 0
+    loop_dur  = 0.1
     while True:
-        event_list = event.get()
-        for event_obj in event_list:
-            jc.handle_event(event_obj)
+	if now()-last_time>loop_dur:
+		last_time = now()
+		event_list = event.get()
+		for event_obj in event_list:
+		    jc.handle_event(event_obj)
 
