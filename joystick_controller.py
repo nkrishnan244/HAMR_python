@@ -56,11 +56,14 @@ class JoystickController:
         self.holonomic_mode = True
         self.delta_turret = 5.0
         self.turret_scalar = 5.0
-        self.velocity_scalar = 0.5
+        self.velocity_scalar = 0.25
         self.messenger = hm.HamrMessenger()
         self.velocity_vector = [0.0, 0.0, 0.0]
 	self.last_time      = 0.0
 	self.loop_dur 	    = 0.1
+	self.sensitivity_constant = 0.5
+	self.left_value = 0	
+	self.right_value = 0
         pygame.init()
         if (joystick.get_count) == 0:
             raise AttributeError('No joystick recognized')
@@ -97,21 +100,29 @@ class JoystickController:
 
     def handle_holonomic_joystick_event(self, axis, value):
         if (axis == self.joystick_axes['X_LEFT']):
-            self.velocity_vector[2] = value
+            self.velocity_vector[2] = value 
         elif (axis == self.joystick_axes['X_RIGHT']):
             self.velocity_vector[0] = value
         elif (axis == self.joystick_axes['Y_RIGHT']):
             self.velocity_vector[1] = -1*value
 	print 'Sending: ' + str(self.velocity_vector[0]) +', '+str(self.velocity_vector[1]) +', '+str(self.velocity_vector[2])
         self._send_holo_message()
+    
 
     def handle_dif_drive_joystick_event(self, axis, value):
         if (axis == self.joystick_axes['Y_LEFT']):
-            self.velocity_vector[1] = value
+	        self.left_value = value
+		if (abs(self.left_value) < 0.05):
+			self.left_value = 0
+           	self.velocity_vector[1] = value
         elif (axis == self.joystick_axes['Y_RIGHT']):
-            self.velocity_vector[0] = value
-        self._send_dif_drive_message()
-
+		self.right_value = value
+		if (abs(self.right_value) < 0.05):
+			self.right_value = 0
+        self.velocity_vector[0] = self.left_value*-1
+	self.velocity_vector[1] = self.right_value*-1			
+	self._send_dif_drive_message()
+ 
     def handle_dif_drive_button_event(self, event):
         if (event.button == self.button_ids['INCREASE_SCALAR']):
             self.turret_scalar += self.delta_turret
@@ -128,11 +139,16 @@ class JoystickController:
             self._send_dif_drive_message()
 
     def _send_dif_drive_message(self):
-        self.velocity_vector[0] = self.velocity_vector[0] * self.velocity_scalar
-        self.velocity_vector[1] = self.velocity_vector[1] * self.velocity_scalar
+        self.velocity_vector[0] = self.velocity_vector[0] 
+        self.velocity_vector[1] = self.velocity_vector[1] 
+	self.velocity_vector[0] = self.sensitivity_constant * (self.velocity_vector[0]) ** 3 + (1 - self.sensitivity_constant) * self.velocity_vector[0]
+	self.velocity_vector[1] = self.sensitivity_constant * (self.velocity_vector[1]) ** 3 + (1 - self.sensitivity_constant) * self.velocity_vector[1]
         self.messenger.send_dif_drive_command(self.velocity_vector[0], self.velocity_vector[1], self.velocity_vector[2])
 
     def _send_holo_message(self):
+	self.velocity_vector[0] = self.sensitivity_constant * (self.velocity_vector[0]) ** 3 + (1 - self.sensitivity_constant) * self.velocity_vector[0]
+	self.velocity_vector[1] = self.sensitivity_constant * (self.velocity_vector[1]) ** 3 + (1 - self.sensitivity_constant) * self.velocity_vector[1]
+	self.velocity_vector[2] = self.sensitivity_constant * (self.velocity_vector[2]) ** 3 + (1 - self.sensitivity_constant) * self.velocity_vector[2]
         self.messenger.send_holonomic_command(self.velocity_vector[0], self.velocity_vector[1], self.velocity_vector[2])
 
 if __name__ == '__main__':
